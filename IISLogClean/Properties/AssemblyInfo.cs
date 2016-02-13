@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("IISLogClean")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("FireflySoft.Net")]
 [assembly: AssemblyProduct("IISLogClean")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright © FireflySoft.Net  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
