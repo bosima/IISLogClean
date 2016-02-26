@@ -19,11 +19,11 @@
                     <ComboBoxItem Content="每周"/>
                     <ComboBoxItem Content="每月"/>
                 </ComboBox>
-                <ComboBox x:Name="cmbPeriodTimeHour" HorizontalAlignment="Left" Margin="302,72,0,0" VerticalAlignment="Top" Width="50"/>
+                <ComboBox x:Name="cmbPeriodTimeHour" HorizontalAlignment="Left" Margin="302,72,0,0" VerticalAlignment="Top" Width="54"/>
                 <Button x:Name="button2" Content="选择文件夹..." HorizontalAlignment="Left" Margin="369,12,0,0" VerticalAlignment="Top" Width="90" Height="23" Click="button2_Click"/>
                 <ComboBox x:Name="cmbPeriodItem" HorizontalAlignment="Left" Margin="188,72,0,0" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.294,0.619" IsEnabled="False"/>
                 <Label x:Name="label3" Content="时间" HorizontalAlignment="Left" Margin="263,71,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="cmbPeriodTimeMinute" HorizontalAlignment="Left" Margin="357,72,0,0" VerticalAlignment="Top" Width="50" RenderTransformOrigin="1.071,0.333"/>
+                <ComboBox x:Name="cmbPeriodTimeMinute" HorizontalAlignment="Left" Margin="361,72,0,0" VerticalAlignment="Top" Width="54" RenderTransformOrigin="1.071,0.333"/>
                 <Label x:Name="label4" Content="周期" HorizontalAlignment="Left" Margin="85,70,0,0" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>

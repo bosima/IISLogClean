@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -15,6 +16,7 @@ namespace IISLogClean
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
         private bool isRunning = false;
         private DispatcherTimer planTimer = null;
         private DateTime? lastDayRunTime = null;
@@ -70,11 +72,25 @@ namespace IISLogClean
 
             Task.Factory.StartNew(() =>
             {
+                txtProgress.Dispatcher.Invoke(new Action(() =>
+                {
+                    txtProgress.Clear();
+                }));
+
                 int successCount = 0;
                 int failCount = 0;
+                string[] subDirectories = null;
 
-                var subDirectories = Directory.GetDirectories(logBasePath);
-                if (subDirectories.Length > 0)
+                try
+                {
+                    subDirectories = Directory.GetDirectories(logBasePath);
+                }
+                catch (Exception ex)
+                {
+                    RenderProgress("目录访问失败：" + ex.Message);
+                }
+
+                if (subDirectories != null && subDirectories.Length > 0)
                 {
                     foreach (var dirName in subDirectories)
                     {
@@ -125,6 +141,8 @@ namespace IISLogClean
 
         private void RenderProgress(string content)
         {
+            logger.Info(content);
+
             txtProgress.Dispatcher.Invoke(new Action(() =>
             {
                 txtProgress.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + content + Environment.NewLine);
