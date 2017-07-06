@@ -70,73 +70,73 @@ namespace IISLogClean
         {
             isRunning = true;
 
-            Task.Factory.StartNew(() =>
+            txtProgress.Dispatcher.Invoke(new Action(() =>
             {
-                txtProgress.Dispatcher.Invoke(new Action(() =>
-                {
-                    txtProgress.Clear();
-                }));
+                txtProgress.Clear();
+                txtProgress.Text = string.Empty;
+            }));
 
-                int successCount = 0;
-                int failCount = 0;
-                string[] subDirectories = null;
+            int successCount = 0;
+            int failCount = 0;
+            string[] subDirectories = null;
 
-                try
-                {
-                    subDirectories = Directory.GetDirectories(logBasePath);
-                }
-                catch (Exception ex)
-                {
-                    RenderProgress("目录访问失败：" + ex.Message);
-                }
+            try
+            {
+                subDirectories = Directory.GetDirectories(logBasePath);
+            }
+            catch (Exception ex)
+            {
+                RenderProgress("目录访问失败：" + ex.Message);
+            }
 
-                if (subDirectories != null && subDirectories.Length > 0)
+            if (subDirectories != null && subDirectories.Length > 0)
+            {
+                foreach (var dirName in subDirectories)
                 {
-                    foreach (var dirName in subDirectories)
+                    string siteLogPath = System.IO.Path.Combine(logBasePath, dirName);
+
+                    // 获取子目录下的文件
+                    string[] siteLogFiles;
+                    try
                     {
-                        string siteLogPath = System.IO.Path.Combine(logBasePath, dirName);
+                        siteLogFiles = Directory.GetFiles(siteLogPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        RenderProgress("获取目录下的文件失败：" + ex.Message);
+                        continue;
+                    }
 
-                        // 获取子目录下的文件
-                        string[] siteLogFiles;
-                        try
+                    if (siteLogFiles.Length > 0)
+                    {
+                        foreach (var logName in siteLogFiles)
                         {
-                            siteLogFiles = Directory.GetFiles(siteLogPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            RenderProgress("获取目录下的文件失败：" + ex.Message);
-                            continue;
-                        }
-
-                        if (siteLogFiles.Length > 0)
-                        {
-                            foreach (var logName in siteLogFiles)
+                            var logPath = System.IO.Path.Combine(siteLogPath, logName);
+                            var logLastWriteTime = File.GetLastWriteTime(logPath);
+                            if (logLastWriteTime.AddDays(logExpireDay) < DateTime.Now)
                             {
-                                var logPath = System.IO.Path.Combine(siteLogPath, logName);
-                                var logLastWriteTime = File.GetLastWriteTime(logPath);
-                                if (logLastWriteTime.AddDays(logExpireDay) < DateTime.Now)
+                                try
                                 {
-                                    try
-                                    {
-                                        File.Delete(logPath);
-                                        successCount++;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        RenderProgress("删除文件失败：" + ex.Message);
-                                        failCount++;
-                                    }
+                                    File.Delete(logPath);
+                                    successCount++;
+                                }
+                                catch (Exception ex)
+                                {
+                                    RenderProgress("删除文件失败：" + ex.Message);
+                                    failCount++;
                                 }
                             }
                         }
-
-                        RenderProgress(dirName + "处理完毕。");
                     }
-                }
 
-                RenderProgress(string.Format("全部处理完毕，成功{0}条，失败{1}条。", successCount, failCount));
-                isRunning = false;
-            });
+                    RenderProgress(dirName + "处理完毕。");
+                }
+            }
+
+            GC.Collect();
+
+            RenderProgress(string.Format("全部处理完毕，成功{0}条，失败{1}条。", successCount, failCount));
+            isRunning = false;
         }
 
         private void RenderProgress(string content)
@@ -145,6 +145,11 @@ namespace IISLogClean
 
             txtProgress.Dispatcher.Invoke(new Action(() =>
             {
+                if (txtProgress.LineCount > 1000)
+                {
+                    txtProgress.Clear();
+                }
+
                 txtProgress.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + content + Environment.NewLine);
             }));
         }
@@ -287,7 +292,7 @@ namespace IISLogClean
             btnStartPlan.IsEnabled = false;
 
             planTimer = new DispatcherTimer();
-            planTimer.Interval = new TimeSpan(0, 0, 1);
+            planTimer.Interval = new TimeSpan(0, 0, 10);
             planTimer.Tick += PlanTimer_Tick;
             planTimer.Start();
         }
